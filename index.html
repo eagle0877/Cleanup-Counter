@@ -22,14 +22,8 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 .header-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--white);}
 .header-sub{font-size:10px;color:var(--seafoam);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
 
-/* ── Mode toggle ── */
-.mode-bar{background:var(--ocean);padding:10px 14px;display:flex;gap:8px;align-items:center;}
-.mode-label{font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.1em;text-transform:uppercase;margin-right:4px;flex-shrink:0;}
-.mode-btn{flex:1;padding:8px 0;border-radius:20px;border:2px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em;}
-.mode-btn.active{background:white;color:var(--ocean);border-color:white;}
-
 /* ── Date bar ── */
-.date-bar{background:var(--ocean);padding:0 14px 10px;display:flex;gap:8px;}
+.date-bar{background:var(--ocean);padding:14px;display:flex;gap:8px;}
 .date-input{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 12px;color:white;font-family:inherit;font-size:13px;outline:none;}
 .date-input::placeholder{color:rgba(255,255,255,.45);}
 
@@ -45,7 +39,8 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 .total-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;position:relative;}
 
 /* ── Section label ── */
-.section-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);padding:16px 20px 8px;}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center;}
+.clear-cats-btn{font-size:9px;color:var(--accent);text-decoration:underline;cursor:pointer;border:none;background:none;text-transform:uppercase;letter-spacing:.05em;}
 
 /* ── Category cards ── */
 .categories{padding:0 14px;display:flex;flex-direction:column;gap:10px;}
@@ -134,7 +129,6 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 <body>
 <div class="phone">
 
-  <!-- Header -->
   <div class="header">
     <div class="header-top">
       <button class="back-btn" onclick="history.back()">‹</button>
@@ -145,17 +139,10 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
     </div>
   </div>
 
-  <!-- Mode toggle + Date -->
-  <div class="mode-bar">
-    <span class="mode-label">Mode:</span>
-    <button class="mode-btn active" id="btnSimple"   onclick="setMode('simple')">⚡ Simple</button>
-    <button class="mode-btn"        id="btnComplete" onclick="setMode('complete')">📋 Complete</button>
-  </div>
   <div class="date-bar">
     <input class="date-input" type="text" id="sessionDate" placeholder="📅 Date">
   </div>
 
-  <!-- Totals banner -->
   <div class="total-banner">
     <div class="totals-row">
       <div class="total-block">
@@ -171,36 +158,34 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
     <div class="total-sub" id="totalSub">Add debris entries below to begin tracking</div>
   </div>
 
-  <!-- Categories -->
-  <div class="section-label">Debris Categories</div>
+  <div class="section-label">
+    Debris Categories
+    <button class="clear-cats-btn" onclick="resetToDefaults()">Reset to Defaults</button>
+  </div>
   <div class="categories" id="categoriesContainer"></div>
 
-  <!-- Add custom -->
   <div class="add-custom-wrap">
     <button class="add-custom-btn" onclick="toggleCustom()">＋  Add Custom Category</button>
   </div>
   <div class="custom-creator" id="customCreator">
-    <input type="text" id="customName" placeholder="Category name (e.g. Rope, Tires, Buoys…)" maxlength="30">
+    <input type="text" id="customName" placeholder="Category name (e.g. Rope, Tires…)" maxlength="30">
     <div class="custom-row">
       <button class="custom-create-btn" onclick="createCustom()">Create</button>
       <button class="custom-cancel-btn" onclick="toggleCustom()">Cancel</button>
     </div>
   </div>
 
-  <!-- Summary -->
   <div class="section-label">Session Summary</div>
   <div class="summary-card">
     <div class="summary-header">📊  Breakdown by Category</div>
     <div id="summaryBody"><div style="padding:14px;font-size:13px;color:#ccc;text-align:center;">No entries yet</div></div>
   </div>
 
-  <!-- Report form — fields toggle based on mode -->
   <div class="section-label">Report Details</div>
   <div class="report-form">
-    <div class="form-header" id="formHeader">⚡ Simple Report</div>
+    <div class="form-header">Cleanup Report</div>
     <div class="form-body">
 
-      <!-- Always shown -->
       <div class="field-row">
         <div class="field-col">
           <label class="field-label">👤 Volunteer Name</label>
@@ -234,7 +219,6 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
         </div>
       </div>
 
-      <!-- GPS — always shown -->
       <div class="field-col" style="margin-bottom:10px;">
         <label class="field-label">📡 GPS Coordinates</label>
         <div class="gps-row">
@@ -244,32 +228,11 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
         <div class="gps-status" id="gpsStatus"></div>
       </div>
 
-      <!-- Complete-only fields -->
-      <div id="completeFields" style="display:none;">
-        <div class="field-row">
-          <div class="field-col">
-            <label class="field-label">🏘 Municipality</label>
-            <input class="field-input" type="text" id="fMunicipality" placeholder="e.g. Halifax">
-          </div>
-          <div class="field-col">
-            <label class="field-label">🏆 Most Interesting Item</label>
-            <input class="field-input" type="text" id="fMostInteresting" placeholder="e.g. life preserver">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field-col">
-            <label class="field-label">📦 Most Common Item</label>
-            <input class="field-input" type="text" id="fMostCommon" placeholder="e.g. plastic bottles">
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
-  <!-- Actions -->
   <div class="action-btns">
-    <button class="btn-reset"  onclick="confirmReset()">🗑 Reset</button>
+    <button class="btn-reset"  onclick="confirmReset()">🗑 Reset Session</button>
     <button class="btn-submit" onclick="submitSession()">📧 Submit Report</button>
   </div>
 
@@ -280,17 +243,15 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 // ─── Constants ────────────────────────────────────────────
 const EMAIL_TO = 'ScotianShorescleanupalert@gmail.com';
 
-// Default 3 categories (no Buoys)
 const DEFAULTS = [
   {id:'plastic',  name:'Plastic',  emoji:'🧴', color:'#3b8fd4'},
-  {id:'metal',    name:'Metal',    emoji:'⚙️', color:'#5a7a8a'},
   {id:'landfill', name:'Landfill', emoji:'🗑️', color:'#8a6a2e'},
+  {id:'metal',    name:'Metal',    emoji:'⚙️', color:'#5a7a8a'},
 ];
 
 // ─── State ────────────────────────────────────────────────
-let mode = localStorage.getItem('ss_mode') || 'simple'; // 'simple' | 'complete'
-let builtinCats = loadBuiltins();   // always the 3 defaults
-let customCats  = loadCustomCats(); // user-created, persisted across sessions
+let builtinCats = loadBuiltins();
+let customCats  = loadCustomCats();
 let categories  = () => [...builtinCats, ...customCats];
 
 // ─── Persistence ─────────────────────────────────────────
@@ -308,23 +269,21 @@ function loadCustomCats() {
 }
 
 function persist() {
-  // Save builtin entries separately
   builtinCats.forEach(c => {
     localStorage.setItem('ss_builtin_' + c.id, JSON.stringify(c.entries));
   });
-  // Save custom cats (with their entries)
   localStorage.setItem('ss_custom_cats', JSON.stringify(customCats));
-  localStorage.setItem('ss_mode', mode);
 }
 
-// ─── Mode ─────────────────────────────────────────────────
-function setMode(m) {
-  mode = m;
-  document.getElementById('btnSimple').classList.toggle('active', m === 'simple');
-  document.getElementById('btnComplete').classList.toggle('active', m === 'complete');
-  document.getElementById('completeFields').style.display = m === 'complete' ? 'block' : 'none';
-  document.getElementById('formHeader').textContent = m === 'simple' ? '⚡ Simple Report' : '📋 Complete Report';
-  persist();
+// ─── Reset Categories ─────────────────────────────────────
+function resetToDefaults() {
+  if (!confirm('This will remove all custom categories and clear current totals. Continue?')) return;
+  customCats = [];
+  builtinCats.forEach(c => c.entries = []);
+  localStorage.removeItem('ss_custom_cats');
+  DEFAULTS.forEach(d => localStorage.removeItem('ss_builtin_' + d.id));
+  renderAll();
+  showToast('✓ Categories reset to defaults');
 }
 
 // ─── Totals ───────────────────────────────────────────────
@@ -392,9 +351,6 @@ function buildCard(cat) {
       ${buildEntriesTable(cat)}
     </div>
   `;
-  ['lbs','items'].forEach(p => {
-    div.querySelector(`#${p}-${cat.id}`).addEventListener('keydown', e => { if(e.key==='Enter') addEntry(cat.id); });
-  });
   return div;
 }
 
@@ -447,17 +403,9 @@ function renderSummary() {
         </tr>
       </tbody>
     </table>`;
-
-  active.forEach(c => {
-    const pct = gl>0 ? (catLbs(c)/gl)*100 : 0;
-    const wrap = document.createElement('div');
-    wrap.className = 'prog-wrap';
-    wrap.innerHTML = `<div class="prog-fill" style="width:${pct}%;background:${c.color||'#4aada0'}"></div>`;
-    body.appendChild(wrap);
-  });
 }
 
-// ─── Category actions ─────────────────────────────────────
+// ─── Actions ─────────────────────────────────────────────
 function toggleCard(id) {
   document.querySelector(`.cat-card[data-id="${id}"]`).classList.toggle('open');
 }
@@ -473,7 +421,6 @@ function addEntry(catId) {
   document.getElementById(`items-${catId}`).value = '';
   persist(); renderAll();
   document.querySelector(`.cat-card[data-id="${catId}"]`).classList.add('open');
-  showToast(`✓ Added to ${cat.name}: ${lbs.toFixed(1)} lbs · ${items} items`);
 }
 
 function deleteEntry(catId, idx) {
@@ -486,131 +433,79 @@ function deleteEntry(catId, idx) {
 function toggleCustom() {
   const el = document.getElementById('customCreator');
   el.classList.toggle('visible');
-  if (el.classList.contains('visible')) document.getElementById('customName').focus();
 }
 
 function createCustom() {
   const name = document.getElementById('customName').value.trim();
-  if (!name) { showToast('⚠️ Enter a category name'); return; }
-  const emojis = ['📦','🪣','🧹','🪝','🛢️','🪤','🧺'];
-  const colors = ['#7a5a9a','#2e8a6a','#d45f3b','#8a5a2e','#2e6a8a','#5a8a3a'];
-  const idx = customCats.length % emojis.length;
-  customCats.push({ id:'custom_'+Date.now(), name, emoji:emojis[idx], color:colors[idx], entries:[] });
+  if (!name) return;
+  customCats.push({ id:'custom_'+Date.now(), name, emoji:'📦', color:'#7a5a9a', entries:[] });
   document.getElementById('customName').value = '';
-  toggleCustom();
-  persist(); renderAll();
-  showToast(`✓ "${name}" category added`);
+  toggleCustom(); persist(); renderAll();
 }
 
-// ─── GPS ──────────────────────────────────────────────────
 function getGPS() {
   const status = document.getElementById('gpsStatus');
-  if (!navigator.geolocation) { status.textContent = '⚠️ GPS not supported on this device'; return; }
   status.textContent = '⏳ Getting location…';
   navigator.geolocation.getCurrentPosition(
     pos => {
       document.getElementById('fGps').value = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
-      status.textContent = `✓ Captured (±${Math.round(pos.coords.accuracy)}m)`;
+      status.textContent = `✓ Captured`;
     },
-    err => {
-      const msgs = {1:'Permission denied',2:'Location unavailable',3:'Request timed out'};
-      status.textContent = '⚠️ ' + (msgs[err.code]||'Could not get location');
-    },
-    { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+    err => { status.textContent = '⚠️ GPS error'; },
+    { enableHighAccuracy:true, timeout:10000 }
   );
 }
 
-// ─── Reset ────────────────────────────────────────────────
 function confirmReset() {
-  if (!confirm('Reset all entries for this session? Custom categories will be kept.')) return;
+  if (!confirm('Clear entries for this session?')) return;
   builtinCats.forEach(c => c.entries = []);
   customCats.forEach(c => c.entries = []);
-  ['fVolunteer','fNumPeople','fArea','fPeopleIncluded','fBandCount','fDiversionPct',
-   'fGps','fMunicipality','fMostInteresting','fMostCommon'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value = '';
-  });
-  document.getElementById('gpsStatus').textContent = '';
   persist(); renderAll();
-  showToast('🗑 Session entries cleared');
 }
 
 // ─── Submit ───────────────────────────────────────────────
 function submitSession() {
-  const te = categories().reduce((s,c) => s+c.entries.length, 0);
-  if (te===0) { showToast('⚠️ No entries to submit yet'); return; }
-
   const v = id => (document.getElementById(id)?.value||'').trim();
-  const date            = v('sessionDate')     || new Date().toLocaleDateString('en-CA');
-  const volunteer       = v('fVolunteer')      || 'Anonymous';
-  const area            = v('fArea');
-  const numPeople       = v('fNumPeople');
-  const peopleIncluded  = v('fPeopleIncluded');
-  const bandCount       = v('fBandCount');
-  const diversionPct    = v('fDiversionPct');
-  const gps             = v('fGps');
-  // Complete-only (blank in simple mode)
-  const municipality    = mode==='complete' ? v('fMunicipality')    : '';
-  const mostInteresting = mode==='complete' ? v('fMostInteresting') : '';
-  const mostCommon      = mode==='complete' ? v('fMostCommon')      : '';
-
+  const date           = v('sessionDate') || new Date().toLocaleDateString('en-CA');
+  const volunteer      = v('fVolunteer')  || 'Anonymous';
+  const area           = v('fArea');
+  const numPeople      = v('fNumPeople');
+  const peopleIncluded = v('fPeopleIncluded');
+  const bandCount      = v('fBandCount');
+  const diversionPct   = v('fDiversionPct');
+  const gps            = v('fGps');
   const gl = grandLbs(), gi = grandItems();
 
-  // ── Human-readable report ─────────────────────────────
   const lines = [
-    `SCOTIAN SHORES CLEANUP REPORT (${mode.toUpperCase()})`,
+    `SCOTIAN SHORES CLEANUP REPORT`,
     '==============================',
-    '',
     `Date:             ${date}`,
-    `Area:             ${area}`,
-    `Municipality:     ${municipality}`,
     `Volunteer:        ${volunteer}`,
+    `Area:             ${area}`,
     `# of People:      ${numPeople}`,
     `People Included:  ${peopleIncluded}`,
     `GPS:              ${gps||'Not captured'}`,
     '',
-    'SUMMARY',
-    '-------',
     `Total Weight:     ${gl.toFixed(1)} lbs`,
     `Total Items:      ${gi}`,
-    `Most Interesting: ${mostInteresting}`,
-    `Most Common:      ${mostCommon}`,
     `Band Count:       ${bandCount}`,
     `Diversion %:      ${diversionPct}`,
     '',
-    'BREAKDOWN BY CATEGORY',
-    '---------------------',
+    'BREAKDOWN:',
   ];
 
-  categories()
-    .filter(c => catLbs(c)>0 || catItems(c)>0)
-    .sort((a,b) => catLbs(b)-catLbs(a))
-    .forEach(c => {
-      const pct = gl>0 ? ((catLbs(c)/gl)*100).toFixed(1) : '0.0';
-      lines.push(`${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs (${pct}%)  ·  ${catItems(c)} items`);
-      if (c.entries.length>1) c.entries.forEach((e,i) => lines.push(`   Entry ${i+1}: ${(e.lbs||0).toFixed(1)} lbs, ${e.items||0} items`));
-    });
+  categories().filter(c => catLbs(c)>0).forEach(c => {
+    lines.push(`${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items`);
+  });
 
-  lines.push('', '------------------------------', 'Submitted via Scotian Shores App');
-
-  // ── Google Sheet CSV row ──────────────────────────────
-  // Headers: Date, Pounds, Municipality, Area, Most Interesting, Most Common,
-  //          # of People, People Included, Band Count, Diversion Percentage, GPS COOR
-  const csv = [date, gl.toFixed(1), municipality, area, mostInteresting, mostCommon,
-               numPeople, peopleIncluded, bandCount, diversionPct, gps]
+  // ── CSV Row Fix ──────────────────────────────────────
+  // Correcting the order and ensuring 'Volunteer' is included as a specific column
+  const csvHeaders = "Date,Volunteer,Pounds,Area,# of People,People Included,Band Count,Diversion Percentage,GPS COOR";
+  const csvRow = [date, volunteer, gl.toFixed(1), area, numPeople, peopleIncluded, bandCount, diversionPct, gps]
     .map(val => { const s=String(val??''); return (s.includes(',')||s.includes('"')) ? '"'+s.replace(/"/g,'""')+'"' : s; })
     .join(',');
 
-  lines.push(
-    '',
-    '══════════════════════════════════════════════',
-    'GOOGLE SHEET ROW — copy the line below:',
-    '══════════════════════════════════════════════',
-    '',
-    'Date,Pounds,Municipality,Area,Most Interesting,Most Common,# of People,People Included,Band Count,Diversion Percentage,GPS COOR',
-    csv,
-    '',
-    '══════════════════════════════════════════════'
-  );
+  lines.push('', 'GOOGLE SHEET ROW:', csvHeaders, csvRow);
 
   const subject = encodeURIComponent(`Cleanup Report — ${area||'Scotian Shores'} — ${date}`);
   const body    = encodeURIComponent(lines.join('\n'));
@@ -618,16 +513,13 @@ function submitSession() {
   showToast('📧 Opening email client…');
 }
 
-// ─── Toast ────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2800);
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ─── Init ─────────────────────────────────────────────────
 document.getElementById('sessionDate').value = new Date().toLocaleDateString('en-CA');
-setMode(mode);
 renderAll();
 </script>
 </body>
