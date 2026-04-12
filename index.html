@@ -539,21 +539,23 @@ function submitSession() {
   const te = categories().reduce((s,c) => s+c.entries.length, 0);
   if (te===0) { showToast('⚠️ No entries to submit yet'); return; }
 
-  const v = id => (document.getElementById(id)?.value||'').trim();
+  // Helper to get values safely
+  const v = id => {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  };
+
   const date            = v('sessionDate')     || new Date().toLocaleDateString('en-CA');
-  const volunteer       = v('fVolunteer')      || 'Anonymous';
+  
+  // FIX: Ensure we are grabbing the string value explicitly
+  const volunteer       = v('fVolunteer')      || 'Anonymous'; 
+  
   const area            = v('fArea');
   const numPeople       = v('fNumPeople');
   const peopleIncluded  = v('fPeopleIncluded');
   const bandCount       = v('fBandCount');
   const diversionPct    = v('fDiversionPct');
   const gps             = v('fGps');
-  // Complete-only (blank in simple mode)
-  const municipality    = mode==='complete' ? v('fMunicipality')    : '';
-  const mostInteresting = mode==='complete' ? v('fMostInteresting') : '';
-  const mostCommon      = mode==='complete' ? v('fMostCommon')      : '';
-
-  const gl = grandLbs(), gi = grandItems();
 
   // ── Human-readable report ─────────────────────────────
   const lines = [
