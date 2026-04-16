@@ -47,6 +47,13 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 /* ── Section label ── */
 .section-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);padding:16px 20px 8px;}
 
+/* ── Simple weight input ── */
+.simple-weight-wrap{padding:0 14px 14px;}
+.simple-weight-card{background:var(--white);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid var(--teal);padding:16px;}
+.simple-weight-label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:8px;}
+.simple-weight-input{width:100%;padding:12px 14px;border:2px solid #e8e8e8;border-radius:10px;font-size:22px;font-family:inherit;background:var(--cream);color:var(--black);outline:none;transition:border-color .2s;}
+.simple-weight-input:focus{border-color:var(--teal);}
+
 /* ── Category cards ── */
 .categories{padding:0 14px;display:flex;flex-direction:column;gap:10px;}
 .cat-card{background:var(--white);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid var(--teal);transition:transform .1s;}
@@ -151,24 +158,38 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
     <div class="total-sub" id="totalSub">Add debris entries below to begin tracking</div>
   </div>
 
-  <div class="section-label">Debris Categories</div>
-  <div class="categories" id="categoriesContainer"></div>
-
-  <div class="add-custom-wrap">
-    <button class="add-custom-btn" onclick="toggleCustom()">＋ Add Custom Category</button>
-  </div>
-  <div class="custom-creator" id="customCreator">
-    <input type="text" id="customName" placeholder="Category name..." maxlength="30">
-    <div style="display:flex; gap:8px;">
-        <button style="flex:1; padding:10px; background:var(--teal); color:white; border:none; border-radius:10px; font-weight:700;" onclick="createCustom()">Create</button>
-        <button style="padding:10px 14px; background:#f0f0f0; border:none; border-radius:10px;" onclick="toggleCustom()">Cancel</button>
+  <!-- Simple mode: just a total weight input -->
+  <div id="simpleWeightSection">
+    <div class="section-label">Total Weight</div>
+    <div class="simple-weight-wrap">
+      <div class="simple-weight-card">
+        <label class="simple-weight-label">⚖️ Total Weight (lbs)</label>
+        <input class="simple-weight-input" type="number" id="simpleWeightInput" step="0.1" placeholder="e.g. 24.5" oninput="updateSimpleWeight()">
+      </div>
     </div>
   </div>
 
-  <div class="section-label">Session Summary</div>
-  <div class="summary-card">
-    <div class="summary-header">📊 Breakdown by Category</div>
-    <div id="summaryBody"></div>
+  <!-- Complete mode: category cards -->
+  <div id="completeCategoriesSection" style="display:none;">
+    <div class="section-label">Debris Categories</div>
+    <div class="categories" id="categoriesContainer"></div>
+
+    <div class="add-custom-wrap">
+      <button class="add-custom-btn" onclick="toggleCustom()">＋ Add Custom Category</button>
+    </div>
+    <div class="custom-creator" id="customCreator">
+      <input type="text" id="customName" placeholder="Category name..." maxlength="30">
+      <div style="display:flex; gap:8px;">
+          <button style="flex:1; padding:10px; background:var(--teal); color:white; border:none; border-radius:10px; font-weight:700;" onclick="createCustom()">Create</button>
+          <button style="padding:10px 14px; background:#f0f0f0; border:none; border-radius:10px;" onclick="toggleCustom()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="section-label">Session Summary</div>
+    <div class="summary-card">
+      <div class="summary-header">📊 Breakdown by Category</div>
+      <div id="summaryBody"></div>
+    </div>
   </div>
 
   <div class="section-label">Report Details</div>
@@ -239,10 +260,14 @@ const DEFAULTS = [
   {id:'landfill', name:'Landfill', emoji:'🗑️', color:'#8a6a2e'}
 ];
 
-let mode = localStorage.getItem('ss_mode') || 'simple';
+// Always default to 'simple' — never restore last mode
+let mode = 'simple';
 let builtinCats = loadBuiltins();
 let customCats = loadCustomCats();
 let categories = () => [...builtinCats, ...customCats];
+
+// Simple weight stored separately (not part of category entries)
+let simpleWeight = 0;
 
 function loadBuiltins() {
   return DEFAULTS.map(d => {
@@ -259,32 +284,60 @@ function loadCustomCats() {
 function persist() {
   builtinCats.forEach(c => localStorage.setItem('ss_builtin_' + c.id, JSON.stringify(c.entries)));
   localStorage.setItem('ss_custom_cats', JSON.stringify(customCats));
-  localStorage.setItem('ss_mode', mode);
+  // Note: we do NOT persist mode — always defaults to simple on load
+}
+
+function persistPeopleIncluded() {
+  const val = document.getElementById('fPeopleIncluded').value.trim();
+  if (val) localStorage.setItem('ss_people_included', val);
 }
 
 function setMode(m) {
   mode = m;
   document.getElementById('btnSimple').classList.toggle('active', m === 'simple');
   document.getElementById('btnComplete').classList.toggle('active', m === 'complete');
-  document.getElementById('completeFields').style.display = m === 'complete' ? 'block' : 'none';
   document.getElementById('formHeader').textContent = m === 'simple' ? '⚡ Simple Report' : '📋 Complete Report';
-  persist();
+
+  // Show/hide simple weight section
+  document.getElementById('simpleWeightSection').style.display = m === 'simple' ? 'block' : 'none';
+  // Show/hide complete categories section
+  document.getElementById('completeCategoriesSection').style.display = m === 'complete' ? 'block' : 'none';
+  // Show/hide complete-only form fields
+  document.getElementById('completeFields').style.display = m === 'complete' ? 'block' : 'none';
+
+  renderTotals();
+}
+
+function updateSimpleWeight() {
+  simpleWeight = parseFloat(document.getElementById('simpleWeightInput').value) || 0;
+  renderTotals();
 }
 
 const catLbs = c => c.entries.reduce((s,e) => s+(e.lbs||0), 0);
 const catItems = c => c.entries.reduce((s,e) => s+(e.items||0), 0);
-const grandLbs = () => categories().reduce((s,c) => s+catLbs(c), 0);
+const grandLbs = () => {
+  if (mode === 'simple') return simpleWeight;
+  return categories().reduce((s,c) => s+catLbs(c), 0);
+};
 
 function renderTotals() {
   const gl = grandLbs();
-  const divertedWeight = categories().reduce((sum, c) => sum + c.entries.reduce((s, e) => s + (e.diverted ? e.lbs : 0), 0), 0);
-  const diversionPct = gl > 0 ? ((divertedWeight / gl) * 100).toFixed(1) : "0";
+  let diversionPct = "0";
+
+  if (mode === 'complete') {
+    const divertedWeight = categories().reduce((sum, c) => sum + c.entries.reduce((s, e) => s + (e.diverted ? e.lbs : 0), 0), 0);
+    diversionPct = gl > 0 ? ((divertedWeight / gl) * 100).toFixed(1) : "0";
+  }
 
   document.getElementById('grandLbs').innerHTML = gl.toFixed(1) + '<span class="total-unit">lbs</span>';
   document.getElementById('realTimeDiversion').innerHTML = diversionPct + '<span class="total-unit">%</span>';
-  
-  const te = categories().reduce((s,c) => s+c.entries.length, 0);
-  document.getElementById('totalSub').textContent = te > 0 ? `${te} entries recorded` : 'Add debris entries below to begin tracking';
+
+  if (mode === 'simple') {
+    document.getElementById('totalSub').textContent = gl > 0 ? `${gl.toFixed(1)} lbs recorded` : 'Enter total weight above to begin tracking';
+  } else {
+    const te = categories().reduce((s,c) => s+c.entries.length, 0);
+    document.getElementById('totalSub').textContent = te > 0 ? `${te} entries recorded` : 'Add debris entries below to begin tracking';
+  }
 }
 
 function buildCard(cat) {
@@ -350,7 +403,7 @@ function addEntry(catId) {
   const items = parseInt(document.getElementById(`items-${catId}`).value) || 0;
   const diverted = document.getElementById(`div-${catId}`).checked;
   if (lbs === 0 && items === 0) return;
-  
+
   const cat = categories().find(c => c.id === catId);
   cat.entries.push({ lbs, items, diverted });
   persist(); renderAll();
@@ -367,7 +420,7 @@ function deleteEntry(catId, idx) {
 function removeCategory(event, id) {
   event.stopPropagation();
   if (!confirm('Remove this category and all its entries?')) return;
-  
+
   const builtinIdx = builtinCats.findIndex(c => c.id === id);
   if (builtinIdx > -1) {
     builtinCats.splice(builtinIdx, 1);
@@ -389,8 +442,8 @@ function createCustom() {
 function toggleCustom() { document.getElementById('customCreator').classList.toggle('visible'); }
 
 function renderSummary() {
-  const gl = grandLbs();
   const body = document.getElementById('summaryBody');
+  if (!body) return;
   const active = categories().filter(c => catLbs(c) > 0 || catItems(c) > 0);
   if (!active.length) { body.innerHTML = '<div style="padding:14px; color:#ccc; text-align:center;">No data</div>'; return; }
 
@@ -420,7 +473,12 @@ function confirmReset() {
 function resetDataOnly() {
   builtinCats.forEach(c => c.entries = []);
   customCats.forEach(c => c.entries = []);
-  ['fNumPeople','fArea','fPeopleIncluded','fBandCount','fGps','fMunicipality','fMostInteresting','fMostCommon'].forEach(id => {
+  simpleWeight = 0;
+  const simpleInput = document.getElementById('simpleWeightInput');
+  if (simpleInput) simpleInput.value = '';
+
+  // Reset form fields EXCEPT fPeopleIncluded (we preserve that)
+  ['fNumPeople','fArea','fBandCount','fGps','fMunicipality','fMostInteresting','fMostCommon'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
   persist(); renderAll();
@@ -428,14 +486,20 @@ function resetDataOnly() {
 
 function submitSession() {
   const gl = grandLbs();
-  if (gl === 0) { showToast('⚠️ No entries found'); return; }
+  if (gl === 0) { showToast('⚠️ No weight entered'); return; }
+
+  // Save people included before submit
+  persistPeopleIncluded();
 
   const v = id => (document.getElementById(id)?.value||'').trim();
   const date = v('sessionDate') || new Date().toLocaleDateString('en-CA');
   const gps = v('fGps');
-  
-  const divertedWeight = categories().reduce((sum, c) => sum + c.entries.reduce((s, e) => s + (e.diverted ? e.lbs : 0), 0), 0);
-  const autoDiv = gl > 0 ? ((divertedWeight / gl) * 100).toFixed(1) : "0";
+
+  let autoDiv = "0";
+  if (mode === 'complete') {
+    const divertedWeight = categories().reduce((sum, c) => sum + c.entries.reduce((s, e) => s + (e.diverted ? e.lbs : 0), 0), 0);
+    autoDiv = gl > 0 ? ((divertedWeight / gl) * 100).toFixed(1) : "0";
+  }
 
   const lines = [
     `CLEANUP REPORT`,
@@ -451,17 +515,34 @@ function submitSession() {
 
   const body = encodeURIComponent(lines.join('\n') + '\n\nCSV:\n' + csv);
   window.location.href = `mailto:${EMAIL_TO}?subject=Report ${date}&body=${body}`;
-  
-  // Reset to blank after submit
+
+  // Reset to blank after submit (but keep people included)
   resetDataOnly();
   showToast('📧 Sending... Data reset.');
 }
 
 function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
 
-function renderAll() { renderTotals(); renderCategories(); renderSummary(); }
+function renderAll() {
+  renderTotals();
+  if (mode === 'complete') {
+    renderCategories();
+    renderSummary();
+  }
+}
 
+// Init
 document.getElementById('sessionDate').value = new Date().toLocaleDateString('en-CA');
+
+// Restore People Included from last session
+const savedPeople = localStorage.getItem('ss_people_included');
+if (savedPeople) document.getElementById('fPeopleIncluded').value = savedPeople;
+
+// Save people included whenever it changes
+document.getElementById('fPeopleIncluded').addEventListener('change', persistPeopleIncluded);
+
+// Always start in simple mode
+setMode('simple');
 renderAll();
 </script>
 </body>
