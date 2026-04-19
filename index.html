@@ -205,7 +205,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 
   <div class="action-btns">
     <button class="btn-reset" onclick="confirmReset()">🗑 Reset</button>
-    <button class="btn-submit" onclick="submitSession()">📧 Submit Report</button>
+    <button class="btn-submit" onclick="submitSession()">📧 Submit</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -355,6 +355,12 @@ function confirmReset() {
   showToast('🗑 Session cleared');
 }
 
+function esc(val) {
+  if (val === null || val === undefined) return '""';
+  let str = String(val).replace(/"/g, '""');
+  return `"${str}"`;
+}
+
 function submitSession() {
   const gl = grandLbs();
   if (gl === 0) { showToast('⚠️ No weight entered'); return; }
@@ -363,25 +369,26 @@ function submitSession() {
   const cat = id => builtinCats.find(c => c.id === id);
 
   let divPct = "0";
+  let catBreakdownText = "";
   if (mode === 'complete') {
     const divWeight = builtinCats.reduce((sum, c) => sum + c.entries.reduce((s, e) => s + (e.diverted ? e.lbs : 0), 0), 0);
     divPct = gl > 0 ? ((divWeight / gl) * 100).toFixed(1) : "0";
+    
+    catBreakdownText = "\nCATEGORY BREAKDOWN:\n";
+    builtinCats.filter(c => catLbs(c) > 0 || catItems(c) > 0).forEach(c => {
+      catBreakdownText += `${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items\n`;
+      if(c.id === 'other'){
+        c.entries.forEach(e => {
+            if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\n`;
+        });
+      }
+    });
   }
 
-  // General CSV
-  const csv1 = [date, gl.toFixed(1), v('fMunicipality'), v('fArea'), v('fMostInteresting'), v('fMostCommon'), v('fNumPeople'), v('fPeopleIncluded'), v('fBandCount'), divPct, v('fGps') ? `"${v('fGps')}"` : ""].join(',');
+  const csv1 = [esc(date), esc(gl.toFixed(1)), esc(v('fMunicipality')), esc(v('fArea')), esc(v('fMostInteresting')), esc(v('fMostCommon')), esc(v('fNumPeople')), esc(v('fPeopleIncluded')), esc(v('fBandCount')), esc(divPct), esc(v('fGps'))].join(',');
+  const csv2 = [esc(v('fPeopleIncluded')), esc(date), esc(v('fArea')), esc(gl.toFixed(1)), esc('Yes'), esc(catLbs(cat('rope')).toFixed(1)), esc(catItems(cat('lobstertags'))), esc(catItems(cat('straps'))), esc(catItems(cat('lobsterbands'))), esc(catItems(cat('escapepanels'))), esc(catItems(cat('traprunners'))), esc(catItems(cat('bottles'))), esc(catItems(cat('shotgunshells'))), esc(catLbs(cat('aquaculture')).toFixed(1)), esc(catItems(cat('fishbins'))), esc(catItems(cat('baitbags'))), esc(catItems(cat('buoys'))), esc(catLbs(cat('traps')).toFixed(1)), esc(''), esc(catLbs(cat('other')).toFixed(1)), esc(catItems(cat('tires')))].join(',');
 
-  // Structural CSV 2
-  const csv2 = [
-    v('fPeopleIncluded'), date, v('fArea'), gl.toFixed(1), '"Yes"',
-    catLbs(cat('rope')).toFixed(1), catItems(cat('lobstertags')), catItems(cat('straps')), catItems(cat('lobsterbands')),
-    catItems(cat('escapepanels')), catItems(cat('traprunners')), catItems(cat('bottles')), catItems(cat('shotgunshells')),
-    catLbs(cat('aquaculture')).toFixed(1), catItems(cat('fishbins')), catItems(cat('baitbags')), catItems(cat('buoys')),
-    catLbs(cat('traps')).toFixed(1), "", // Empty cell
-    catLbs(cat('other')).toFixed(1), catItems(cat('tires'))
-  ].join(',');
-
-  const body = encodeURIComponent(`CLEANUP REPORT\nDate: ${date}\nArea: ${v('fArea')}\nWeight: ${gl.toFixed(1)} lbs\nDiversion: ${divPct}%\n\nCSV 1 (General):\n${csv1}\n\nCSV 2 (Internal):\n${csv2}`);
+  const body = encodeURIComponent(`CLEANUP REPORT\nDate: ${date}\nArea: ${v('fArea')}\nWeight: ${gl.toFixed(1)} lbs\nDiversion: ${divPct}%${catBreakdownText}\n\nCSV 1 (General):\n${csv1}\n\nCSV 2 (Internal):\n${csv2}`);
   window.location.href = `mailto:${EMAIL_TO}?subject=Cleanup ${date}&body=${body}`;
   showToast('📧 Sending...');
 }
