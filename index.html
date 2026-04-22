@@ -200,7 +200,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
         <label class="field-label">📡 GPS Coordinates</label>
         <div class="gps-row">
           <input class="field-input" style="flex:1" type="text" id="fGps" placeholder="Tap 🎯">
-          <button class="gps-btn" type="button" onclick="getGPS()">🎯</button>
+          <button class="gps-btn" type="button" onclick="getGPS()" aria-label="Get current device location">🎯</button>
         </div>
         <div class="gps-status" id="gpsStatus"></div>
       </div>
@@ -401,13 +401,64 @@ function renderSummary() {
   body.innerHTML = `<table class="summary-table"><thead><tr><th>Category</th><th class="r">lbs</th><th class="r">Items</th></tr></thead><tbody>${active.map(c => `<tr><td>${c.emoji} ${c.name}</td><td class="r">${catLbs(c).toFixed(1)}</td><td class="r">${catItems(c)}</td></tr>`).join('')}</tbody></table>`;
 }
 
-function getGPS() {
+async function getGeolocationPermissionState() {
+  if (!navigator.permissions || !navigator.permissions.query) return 'unknown';
+  try {
+    const result = await navigator.permissions.query({ name: 'geolocation' });
+    return result.state;
+  } catch (err) {
+    return 'unknown';
+  }
+}
+
+async function getGPS() {
   const status = document.getElementById('gpsStatus');
-  status.textContent = '⏳ Locating...';
-  navigator.geolocation.getCurrentPosition(p => {
-    document.getElementById('fGps').value = `${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;
-    status.textContent = '✓ Captured';
-  }, () => status.textContent = '⚠️ Failed');
+  const gpsInput = document.getElementById('fGps');
+
+  if (!('geolocation' in navigator)) {
+    status.textContent = '⚠️ This device/browser does not support location';
+    showToast('⚠️ Geolocation not supported');
+    return;
+  }
+
+  status.textContent = '⏳ Getting device location...';
+
+  const permissionState = await getGeolocationPermissionState();
+
+  if (permissionState === 'denied') {
+    status.textContent = '⚠️ Location permission is blocked for this browser';
+    showToast('Enable location permission in browser settings');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude, accuracy } = position.coords;
+      gpsInput.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      status.textContent = `✓ Captured from this device (${Math.round(accuracy)}m accuracy)`;
+      showToast('📍 Device location captured');
+    },
+    (error) => {
+      if (error.code === error.PERMISSION_DENIED) {
+        status.textContent = '⚠️ Permission denied';
+        showToast('Allow location access to use GPS');
+      } else if (error.code === error.POSITION_UNAVAILABLE) {
+        status.textContent = '⚠️ Position unavailable';
+        showToast('Location unavailable on this device right now');
+      } else if (error.code === error.TIMEOUT) {
+        status.textContent = '⚠️ Timed out getting location';
+        showToast('GPS request timed out, try again outdoors');
+      } else {
+        status.textContent = '⚠️ Failed to get location';
+        showToast('Unable to get GPS location');
+      }
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+  );
 }
 
 function confirmReset() {
@@ -441,12 +492,12 @@ function buildEmailData() {
 
   let catBreakdownText = "";
   if (mode === 'complete') {
-    catBreakdownText = "\nCATEGORY BREAKDOWN:\n";
+    catBreakdownText = "\\nCATEGORY BREAKDOWN:\\n";
     builtinCats.filter(c => catLbs(c) > 0 || catItems(c) > 0).forEach(c => {
-      catBreakdownText += `${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items\n`;
+      catBreakdownText += `${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items\\n`;
       if(c.id === 'other'){
         c.entries.forEach(e => {
-          if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\n`;
+          if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\\n`;
         });
       }
     });
@@ -473,7 +524,7 @@ function buildEmailData() {
   return {
     date,
     subject: `Cleanup ${date}`,
-    body: `CLEANUP REPORT\nDate: ${date}\nArea: ${v('fArea')}\nWeight: ${gl.toFixed(1)} lbs\nDiversion: ${divPct}%${catBreakdownText}\n\nCSV 1 (General):\n${csv1}\n\nCSV 2 (Internal):\n${csv2}`
+    body: `CLEANUP REPORT\\nDate: ${date}\\nArea: ${v('fArea')}\\nWeight: ${gl.toFixed(1)} lbs\\nDiversion: ${divPct}%${catBreakdownText}\\n\\nCSV 1 (General):\\n${csv1}\\n\\nCSV 2 (Internal):\\n${csv2}`
   };
 }
 
@@ -565,7 +616,6 @@ function buildSecondGoogleFormPayload() {
     'entry.1609833457': v('fMostCommon')
   };
 }
-
 
 function getQueue() {
   try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); }
