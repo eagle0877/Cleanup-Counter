@@ -14,7 +14,7 @@
 html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(--cream);overflow-x:hidden;}
 .phone{width:100%;max-width:420px;min-height:100vh;margin:0 auto;background:var(--cream);display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.25);}
 
-/* ── Header ── */
+/* Header */
 .header{background:var(--black);padding:14px 20px 0;flex-shrink:0;position:sticky;top:0;z-index:50;}
 .header::after{content:'';display:block;height:3px;margin-top:12px;background:linear-gradient(90deg,var(--teal),var(--seafoam),var(--accent),var(--seafoam),var(--teal));}
 .header-top{display:flex;align-items:center;gap:10px;padding-bottom:12px;}
@@ -22,15 +22,16 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 .header-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--white);}
 .header-sub{font-size:10px;color:var(--seafoam);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
 
-/* ── Mode toggle ── */
+/* Mode toggle */
 .mode-bar{background:var(--ocean);padding:10px 14px;display:flex;gap:8px;align-items:center;}
 .mode-btn{flex:1;padding:8px 0;border-radius:20px;border:2px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.6);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em;}
 .mode-btn.active{background:white;color:var(--ocean);border-color:white;}
 
 .date-bar{background:var(--ocean);padding:0 14px 10px;display:flex;gap:8px;}
 .date-input{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 12px;color:white;font-family:inherit;font-size:13px;outline:none;}
+.date-input::placeholder{color:rgba(255,255,255,.8);}
 
-/* ── Banner ── */
+/* Banner */
 .total-banner{background:linear-gradient(135deg,var(--ocean),var(--teal));padding:16px 20px;text-align:center;position:relative;overflow:hidden;}
 .total-banner::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30 Q15 10 30 30 Q45 50 60 30' stroke='white' stroke-width='1' fill='none' opacity='0.06'/%3E%3C/svg%3E") repeat;}
 .totals-row{display:flex;justify-content:center;gap:0;position:relative;}
@@ -43,7 +44,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 
 .section-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);padding:16px 20px 8px;}
 
-/* ── Complete Mode Dropdown ── */
+/* Complete mode dropdown */
 .dropdown-wrap{padding:0 14px 10px;}
 .cat-select{width:100%;padding:12px;border-radius:12px;border:2px solid var(--teal);background:var(--white);font-family:inherit;font-size:16px;font-weight:600;color:var(--ocean);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232d7a6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;}
 
@@ -58,7 +59,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 
 .add-btn{width:100%;padding:12px;border-radius:10px;background:var(--teal);color:white;border:none;cursor:pointer;font-weight:700;}
 
-/* ── Tables & Summary ── */
+/* Tables & Summary */
 .entries-table{width:100%;border-collapse:collapse;margin-top:12px;}
 .entries-table td{font-size:13px;color:#444;padding:8px 6px;border-bottom:1px solid #fafafa;}
 .entries-table td.r{text-align:right;font-weight:700;color:var(--black);}
@@ -71,7 +72,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 .summary-table td{padding:9px 14px;font-size:13px;color:#444;border-bottom:1px solid #f8f8f8;}
 .summary-table td.r{text-align:right;font-weight:700;color:var(--black);}
 
-/* ── Report Form ── */
+/* Report Form */
 .report-form{margin:0 14px;background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);}
 .form-header{background:var(--black);padding:12px 16px;font-family:'Playfair Display',serif;font-size:15px;color:white;font-weight:700;}
 .form-body{padding:14px;}
@@ -80,15 +81,26 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 .field-label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:4px;}
 .field-input, .field-select{width:100%;padding:10px 12px;border:2px solid #e4e4e4;border-radius:10px;font-family:inherit;font-size:14px;background:var(--cream);outline:none;}
 .gps-row{display:flex;gap:6px;align-items:center;}
-.gps-btn{width:40px;height:40px;border-radius:10px;background:var(--ocean);border:none;cursor:pointer;font-size:18px;}
+.gps-btn{width:40px;height:40px;border-radius:10px;background:var(--ocean);border:none;cursor:pointer;font-size:18px;color:#fff;}
 .gps-status{font-size:11px;margin-top:3px;color:var(--teal);min-height:14px;}
 
-.action-btns{display:flex;gap:8px;margin:14px 14px 28px;}
+.sync-note{margin:0 14px 8px;background:#eef8f5;border:1px solid #d5ece5;border-radius:14px;padding:10px 12px;font-size:12px;color:var(--ocean);}
+.sync-note b{color:var(--teal);}
+
+.action-btns{display:flex;gap:8px;margin:14px 14px 8px;}
 .btn-reset{flex:1;padding:14px;background:#f5f1e8;border:2px solid #ddd;border-radius:14px;cursor:pointer;font-weight:700;color:#888;}
 .btn-submit{flex:2;padding:14px;background:var(--teal);color:white;border:none;border-radius:14px;cursor:pointer;font-weight:700;}
 
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:white;padding:12px 22px;border-radius:30px;font-size:13px;transition:transform .3s,opacity .3s;opacity:0;z-index:999;}
+.action-btns-secondary{display:flex;gap:8px;margin:0 14px 28px;}
+.btn-secondary{flex:1;padding:12px;background:var(--ocean);color:white;border:none;border-radius:14px;cursor:pointer;font-weight:700;}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:white;padding:12px 22px;border-radius:30px;font-size:13px;transition:transform .3s,opacity .3s;opacity:0;z-index:999;max-width:90vw;text-align:center;}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+@media (max-width:380px){
+  .field-row,.action-btns,.action-btns-secondary,.input-grid{grid-template-columns:1fr;display:grid;}
+  .total-num{font-size:32px;}
+}
 </style>
 </head>
 <body>
@@ -105,8 +117,8 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
   </div>
 
   <div class="mode-bar">
-    <button class="mode-btn active" id="btnSimple"   onclick="setMode('simple')">⚡ Simple</button>
-    <button class="mode-btn"        id="btnComplete" onclick="setMode('complete')">📋 Complete</button>
+    <button class="mode-btn active" id="btnSimple" onclick="setMode('simple')">⚡ Simple</button>
+    <button class="mode-btn" id="btnComplete" onclick="setMode('complete')">📋 Complete</button>
   </div>
   <div class="date-bar">
     <input class="date-input" type="text" id="sessionDate" placeholder="📅 Date">
@@ -166,8 +178,8 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
       </div>
       <div class="field-row">
         <div class="field-col">
-          <label class="field-label">👥 People Included</label>
-          <input class="field-input" type="text" id="fPeopleIncluded">
+          <label class="field-label">☎️ Name / Contact Info</label>
+          <input class="field-input" type="text" id="fPeopleIncluded" placeholder="Name, phone, or email">
         </div>
         <div class="field-col">
           <label class="field-label">🥁 Band Count</label>
@@ -188,7 +200,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
         <label class="field-label">📡 GPS Coordinates</label>
         <div class="gps-row">
           <input class="field-input" style="flex:1" type="text" id="fGps" placeholder="Tap 🎯">
-          <button class="gps-btn" onclick="getGPS()">🎯</button>
+          <button class="gps-btn" type="button" onclick="getGPS()">🎯</button>
         </div>
         <div class="gps-status" id="gpsStatus"></div>
       </div>
@@ -223,15 +235,26 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
     </div>
   </div>
 
+  <div class="sync-note" id="syncNote">Pending uploads: <b id="pendingCount">0</b> · Saves offline if no service and uploads later.</div>
+
   <div class="action-btns">
-    <button class="btn-reset" onclick="confirmReset()">🗑 Reset</button>
-    <button class="btn-submit" onclick="submitSession()">📧 Submit</button>
+    <button class="btn-reset" type="button" onclick="confirmReset()">🗑 Reset</button>
+    <button class="btn-submit" type="button" onclick="submitSession()">☁️ Submit</button>
+  </div>
+  <div class="action-btns-secondary">
+    <button class="btn-secondary" type="button" onclick="flushPendingSubmissions(true)">🔄 Sync Now</button>
+    <button class="btn-secondary" type="button" onclick="submitByEmail()">📧 Email Backup</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
 const EMAIL_TO = 'ScotianShorescleanupalert@gmail.com';
+
+const FORM_RESPONSE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfQoApZygjlkAWP5BYKq0Z6eknBpZNIY_mfcsinMD4JjjaJiw/formResponse';
+const SECOND_FORM_RESPONSE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfmWBfaMNnaAN7wJ6WhEQax1P5MwUt15nggL8iRIKPpV1Cecw/formResponse';
+
+const QUEUE_KEY = 'ss_pending_submissions_v2';
 
 const DEFAULTS = [
   {id:'aquaculture', name:'Aquaculture Pipe', emoji:'➰'},
@@ -298,7 +321,9 @@ function renderActiveCategory() {
   const catId = document.getElementById('catSelector').value;
   const cat = builtinCats.find(c => c.id === catId);
   const container = document.getElementById('activeCategoryArea');
-  const otherField = catId === 'other' ? `<div class="input-col" style="grid-column: span 2; margin-bottom: 8px;"><label>Item Description</label><input type="text" id="name-${catId}"></div>` : '';
+  const otherField = catId === 'other'
+    ? `<div class="input-col" style="grid-column: span 2; margin-bottom: 8px;"><label>Item Description</label><input type="text" id="name-${catId}"></div>`
+    : '';
   container.innerHTML = `
     <div class="active-cat-card">
       <div class="input-grid">
@@ -307,14 +332,16 @@ function renderActiveCategory() {
         <div class="input-col"><label>Items Found</label><input type="number" id="items-${catId}"></div>
       </div>
       <div class="div-row" onclick="document.getElementById('div-${catId}').click()"><input type="checkbox" id="div-${catId}" onclick="event.stopPropagation()"><label>Diverted from Landfill?</label></div>
-      <button class="add-btn" onclick="addEntry('${catId}')">＋ Add to Session</button>
+      <button class="add-btn" type="button" onclick="addEntry('${catId}')">＋ Add to Session</button>
       <div id="list-${catId}">${buildEntriesTable(cat)}</div>
     </div>`;
 }
 
 function buildEntriesTable(cat) {
   if (!cat.entries.length) return '';
-  return `<table class="entries-table">${cat.entries.map((e,i) => `<tr><td>${e.customName || ('Entry ' + (i+1))} ${e.diverted ? '♻️' : ''}</td><td class="r">${(e.lbs||0).toFixed(1)} lb</td><td class="r">${e.items||0} ct</td><td style="width:30px; text-align:right;"><button class="del-btn" onclick="deleteEntry('${cat.id}',${i})">✕</button></td></tr>`).join('')}</table>`;
+  return `<table class="entries-table">${cat.entries.map((e,i) =>
+    `<tr><td>${e.customName || ('Entry ' + (i+1))} ${e.diverted ? '♻️' : ''}</td><td class="r">${(e.lbs||0).toFixed(1)} lb</td><td class="r">${e.items||0} ct</td><td style="width:30px; text-align:right;"><button class="del-btn" type="button" onclick="deleteEntry('${cat.id}',${i})">✕</button></td></tr>`
+  ).join('')}</table>`;
 }
 
 function addEntry(catId) {
@@ -325,28 +352,40 @@ function addEntry(catId) {
   if (lbs === 0 && items === 0) return;
   const cat = builtinCats.find(c => c.id === catId);
   cat.entries.push({ lbs, items, diverted, customName });
-  persist(); renderAll(); renderActiveCategory();
+  persist();
+  renderAll();
+  renderActiveCategory();
 }
 
 function deleteEntry(catId, idx) {
   const cat = builtinCats.find(c => c.id === catId);
   cat.entries.splice(idx, 1);
-  persist(); renderAll(); renderActiveCategory();
+  persist();
+  renderAll();
+  renderActiveCategory();
 }
 
-function updateSimpleWeight() { simpleWeight = parseFloat(document.getElementById('simpleWeightInput').value) || 0; renderTotals(); }
+function updateSimpleWeight() {
+  simpleWeight = parseFloat(document.getElementById('simpleWeightInput').value) || 0;
+  renderTotals();
+}
 
-const catLbs = c => c.entries.reduce((s,e) => s+(e.lbs||0), 0);
-const catItems = c => c.entries.reduce((s,e) => s+(e.items||0), 0);
-const grandLbs = () => (mode === 'simple' ? simpleWeight : builtinCats.reduce((s,c) => s+catLbs(c), 0));
+const catLbs = c => c.entries.reduce((s,e) => s + (e.lbs || 0), 0);
+const catItems = c => c.entries.reduce((s,e) => s + (e.items || 0), 0);
+const grandLbs = () => (mode === 'simple' ? simpleWeight : builtinCats.reduce((s,c) => s + catLbs(c), 0));
+
+function getDiversionPct() {
+  const gl = grandLbs();
+  if (mode !== 'complete') return '0';
+  const divWeight = builtinCats.reduce((sum, c) =>
+    sum + c.entries.reduce((s, e) => s + (e.diverted ? (e.lbs || 0) : 0), 0), 0
+  );
+  return gl > 0 ? ((divWeight / gl) * 100).toFixed(1) : '0';
+}
 
 function renderTotals() {
   const gl = grandLbs();
-  let divPct = "0";
-  if (mode === 'complete') {
-    const divWeight = builtinCats.reduce((sum, c) => sum + c.entries.reduce((s, e) => s + (e.diverted ? e.lbs : 0), 0), 0);
-    divPct = gl > 0 ? ((divWeight / gl) * 100).toFixed(1) : "0";
-  }
+  const divPct = getDiversionPct();
   document.getElementById('grandLbs').innerHTML = gl.toFixed(1) + '<span class="total-unit">lbs</span>';
   document.getElementById('realTimeDiversion').innerHTML = divPct + '<span class="total-unit">%</span>';
   document.getElementById('totalSub').textContent = gl > 0 ? `${gl.toFixed(1)} lbs recorded` : 'Add debris entries below';
@@ -355,12 +394,16 @@ function renderTotals() {
 function renderSummary() {
   const body = document.getElementById('summaryBody');
   const active = builtinCats.filter(c => catLbs(c) > 0 || catItems(c) > 0);
-  if (!active.length) { body.innerHTML = '<div style="padding:14px; color:#ccc; text-align:center; font-size:12px;">No categories recorded yet</div>'; return; }
+  if (!active.length) {
+    body.innerHTML = '<div style="padding:14px; color:#ccc; text-align:center; font-size:12px;">No categories recorded yet</div>';
+    return;
+  }
   body.innerHTML = `<table class="summary-table"><thead><tr><th>Category</th><th class="r">lbs</th><th class="r">Items</th></tr></thead><tbody>${active.map(c => `<tr><td>${c.emoji} ${c.name}</td><td class="r">${catLbs(c).toFixed(1)}</td><td class="r">${catItems(c)}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function getGPS() {
-  const status = document.getElementById('gpsStatus'); status.textContent = '⏳ Locating...';
+  const status = document.getElementById('gpsStatus');
+  status.textContent = '⏳ Locating...';
   navigator.geolocation.getCurrentPosition(p => {
     document.getElementById('fGps').value = `${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;
     status.textContent = '✓ Captured';
@@ -371,11 +414,15 @@ function confirmReset() {
   if (!confirm('Clear all session data?')) return;
   builtinCats.forEach(c => c.entries = []);
   simpleWeight = 0;
-  const si = document.getElementById('simpleWeightInput'); if(si) si.value = '';
-  ['fNumPeople','fArea','fBandCount','fGps','fMunicipality','fMostInteresting','fMostCommon'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value = '';
+  const si = document.getElementById('simpleWeightInput');
+  if (si) si.value = '';
+  ['fNumPeople','fArea','fBandCount','fGps','fMunicipality','fMostInteresting','fMostCommon','fPeopleIncluded'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
-  persist(); renderAll(); if(mode === 'complete') renderActiveCategory();
+  persist();
+  renderAll();
+  if (mode === 'complete') renderActiveCategory();
   showToast('🗑 Session cleared');
 }
 
@@ -385,42 +432,263 @@ function esc(val) {
   return `"${str}"`;
 }
 
-function submitSession() {
+function buildEmailData() {
   const gl = grandLbs();
-  if (gl === 0) { showToast('⚠️ No weight entered'); return; }
   const v = id => (document.getElementById(id)?.value||'').trim();
   const date = v('sessionDate') || new Date().toLocaleDateString('en-CA');
   const cat = id => builtinCats.find(c => c.id === id);
+  const divPct = getDiversionPct();
 
-  let divPct = "0";
   let catBreakdownText = "";
   if (mode === 'complete') {
-    const divWeight = builtinCats.reduce((sum, c) => sum + c.entries.reduce((s, e) => s + (e.diverted ? e.lbs : 0), 0), 0);
-    divPct = gl > 0 ? ((divWeight / gl) * 100).toFixed(1) : "0";
-    
     catBreakdownText = "\nCATEGORY BREAKDOWN:\n";
     builtinCats.filter(c => catLbs(c) > 0 || catItems(c) > 0).forEach(c => {
       catBreakdownText += `${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items\n`;
       if(c.id === 'other'){
         c.entries.forEach(e => {
-            if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\n`;
+          if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\n`;
         });
       }
     });
   }
 
-  const csv1 = [esc(date), esc(gl.toFixed(1)), esc(v('fMunicipality')), esc(v('fArea')), esc(v('fMostInteresting')), esc(v('fMostCommon')), esc(v('fNumPeople')), esc(v('fPeopleIncluded')), esc(v('fBandCount')), esc(divPct), esc(v('fGps'))].join(',');
-  const csv2 = [esc(v('fPeopleIncluded')), esc(date), esc(v('fArea')), esc(gl.toFixed(1)), esc('Yes'), esc(catLbs(cat('rope')).toFixed(1)), esc(catItems(cat('lobstertags'))), esc(catItems(cat('straps'))), esc(catItems(cat('lobsterbands'))), esc(catItems(cat('escapepanels'))), esc(catItems(cat('traprunners'))), esc(catItems(cat('bottles'))), esc(catItems(cat('shotgunshells'))), esc(catLbs(cat('aquaculture')).toFixed(1)), esc(catItems(cat('fishbins'))), esc(catItems(cat('baitbags'))), esc(catItems(cat('buoys'))), esc(catLbs(cat('traps')).toFixed(1)), esc(''), esc(catLbs(cat('other')).toFixed(1)), esc(catItems(cat('tires')))].join(',');
+  const csv1 = [
+    esc(date), esc(gl.toFixed(1)), esc(v('fMunicipality')), esc(v('fArea')),
+    esc(v('fMostInteresting')), esc(v('fMostCommon')), esc(v('fNumPeople')),
+    esc(v('fPeopleIncluded')), esc(v('fBandCount')), esc(divPct), esc(v('fGps'))
+  ].join(',');
 
-  const body = encodeURIComponent(`CLEANUP REPORT\nDate: ${date}\nArea: ${v('fArea')}\nWeight: ${gl.toFixed(1)} lbs\nDiversion: ${divPct}%${catBreakdownText}\n\nCSV 1 (General):\n${csv1}\n\nCSV 2 (Internal):\n${csv2}`);
-  window.location.href = `mailto:${EMAIL_TO}?subject=Cleanup ${date}&body=${body}`;
-  showToast('📧 Sending...');
+  const csv2 = [
+    esc(v('fPeopleIncluded')), esc(date), esc(v('fArea')), esc(gl.toFixed(1)),
+    esc('Yes'), esc(catLbs(cat('rope')).toFixed(1)), esc(catItems(cat('lobstertags'))),
+    esc(catItems(cat('straps'))), esc(catItems(cat('lobsterbands'))),
+    esc(catItems(cat('escapepanels'))), esc(catItems(cat('traprunners'))),
+    esc(catItems(cat('bottles'))), esc(catItems(cat('shotgunshells'))),
+    esc(catLbs(cat('aquaculture')).toFixed(1)), esc(catItems(cat('fishbins'))),
+    esc(catItems(cat('baitbags'))), esc(catItems(cat('buoys'))),
+    esc(catLbs(cat('traps')).toFixed(1)), esc(''),
+    esc(catLbs(cat('other')).toFixed(1)), esc(catItems(cat('tires')))
+  ].join(',');
+
+  return {
+    date,
+    subject: `Cleanup ${date}`,
+    body: `CLEANUP REPORT\nDate: ${date}\nArea: ${v('fArea')}\nWeight: ${gl.toFixed(1)} lbs\nDiversion: ${divPct}%${catBreakdownText}\n\nCSV 1 (General):\n${csv1}\n\nCSV 2 (Internal):\n${csv2}`
+  };
 }
 
-function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
-function renderAll() { renderTotals(); if (mode === 'complete') renderSummary(); }
+function submitByEmail() {
+  const gl = grandLbs();
+  if (gl === 0) {
+    showToast('⚠️ No weight entered');
+    return;
+  }
+  const emailData = buildEmailData();
+  const body = encodeURIComponent(emailData.body);
+  window.location.href = `mailto:${EMAIL_TO}?subject=${encodeURIComponent(emailData.subject)}&body=${body}`;
+  showToast('📧 Opening email');
+}
+
+function buildGoogleFormPayload() {
+  const gl = grandLbs();
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  const date = v('sessionDate') || new Date().toLocaleDateString('en-CA');
+  const divPct = getDiversionPct();
+
+  return {
+    'entry.1435993974': date,
+    'entry.1049185717': gl.toFixed(1),
+    'entry.2050587287': v('fMunicipality'),
+    'entry.363926447': v('fArea'),
+    'entry.1341819910': v('fMostInteresting'),
+    'entry.891233553': v('fMostCommon'),
+    'entry.1335521278': v('fBandCount'),
+    'entry.2054382914': v('fNumPeople'),
+    'entry.1578291135': v('fPeopleIncluded'),
+    'entry.748449577': divPct
+  };
+}
+
+function buildSecondGoogleFormPayload() {
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  const date = v('sessionDate') || new Date().toLocaleDateString('en-CA');
+  const name = v('fPeopleIncluded');
+  const area = v('fArea');
+  const totalWeight = grandLbs().toFixed(1);
+
+  const cat = id => builtinCats.find(c => c.id === id);
+  const lbs = id => catLbs(cat(id)).toFixed(1);
+  const items = id => String(catItems(cat(id)) || 0);
+
+  const aquacultureWeight = lbs('aquaculture');
+
+  const buoyCount = catItems(cat('buoys'));
+  const buoyWeight = catLbs(cat('buoys')).toFixed(1);
+  const buoyDetails = (buoyCount || parseFloat(buoyWeight) > 0)
+    ? `${buoyCount} item(s), ${buoyWeight} lb total`
+    : '';
+
+  const trapWeight = catLbs(cat('traps')).toFixed(1);
+  const trapCount = catItems(cat('traps'));
+  const trapHasDiversion = cat('traps').entries.some(e => e.diverted);
+  const trapDetails = (trapCount || parseFloat(trapWeight) > 0)
+    ? `${trapCount} trap item(s), ${trapWeight} lb total, diverted=${trapHasDiversion ? 'yes' : 'no'}`
+    : '';
+
+  const otherDetails = cat('other').entries.length
+    ? cat('other').entries
+        .map(e => `${e.customName || 'Unnamed item'}: ${(e.lbs || 0).toFixed(1)} lb`)
+        .join('; ')
+    : '';
+
+  return {
+    'entry.1308730507': name,
+    'entry.1067821295': date,
+    'entry.119999879': area,
+    'entry.1463914399': totalWeight,
+    'entry.2025600265': 'Yes',
+    'entry.490642069': lbs('rope'),
+    'entry.1628970666': items('lobstertags'),
+    'entry.1097098540': items('straps'),
+    'entry.195466768': items('lobsterbands'),
+    'entry.937456014': items('escapepanels'),
+    'entry.1912208779': items('traprunners'),
+    'entry.1425204218': items('bottles'),
+    'entry.1131475080': items('shotgunshells'),
+    'entry.1562712190': aquacultureWeight,
+    'entry.775032750': items('fishbins'),
+    'entry.1597393584': items('baitbags'),
+    'entry.398301726': buoyDetails,
+    'entry.364333836': items('tires'),
+    'entry.282281821': trapDetails,
+    'entry.777621009': otherDetails,
+    'entry.1609833457': v('fMostCommon')
+  };
+}
+
+
+function getQueue() {
+  try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveQueue(queue) {
+  localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+  updatePendingCount();
+}
+
+function updatePendingCount() {
+  const count = getQueue().length;
+  document.getElementById('pendingCount').textContent = count;
+}
+
+async function postFormPayload(url, payload) {
+  const body = new URLSearchParams(payload).toString();
+  await fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    body
+  });
+  return true;
+}
+
+async function flushPendingSubmissions(showFeedback = false) {
+  const queue = getQueue();
+
+  if (!queue.length) {
+    if (showFeedback) showToast('✓ No pending uploads');
+    return;
+  }
+
+  if (!navigator.onLine) {
+    if (showFeedback) showToast('📴 Still offline');
+    return;
+  }
+
+  const remaining = [];
+
+  for (const item of queue) {
+    try {
+      await postFormPayload(FORM_RESPONSE_URL, item.payload1);
+      if (item.sendSecond && item.payload2) {
+        await postFormPayload(SECOND_FORM_RESPONSE_URL, item.payload2);
+      }
+    } catch (err) {
+      remaining.push(item);
+    }
+  }
+
+  saveQueue(remaining);
+
+  if (showFeedback) {
+    showToast(remaining.length ? `⚠️ ${remaining.length} still pending` : '☁️ Pending uploads synced');
+  } else if (queue.length && remaining.length === 0) {
+    showToast('☁️ Pending uploads synced');
+  }
+}
+
+async function submitSession() {
+  const gl = grandLbs();
+  if (gl === 0) {
+    showToast('⚠️ No weight entered');
+    return;
+  }
+
+  const payload1 = buildGoogleFormPayload();
+  const sendSecond = mode === 'complete';
+  const payload2 = sendSecond ? buildSecondGoogleFormPayload() : null;
+
+  const queuedItem = {
+    ts: Date.now(),
+    sendSecond,
+    payload1,
+    payload2
+  };
+
+  if (!navigator.onLine) {
+    const queue = getQueue();
+    queue.push(queuedItem);
+    saveQueue(queue);
+    showToast(sendSecond ? '📴 Saved offline, both reports will upload later' : '📴 Saved offline, report will upload later');
+    return;
+  }
+
+  try {
+    await postFormPayload(FORM_RESPONSE_URL, payload1);
+    if (sendSecond && payload2) {
+      await postFormPayload(SECOND_FORM_RESPONSE_URL, payload2);
+    }
+    showToast(sendSecond ? '✅ Submitted to both forms' : '✅ Submitted to main form');
+    setTimeout(() => flushPendingSubmissions(false), 600);
+  } catch (err) {
+    const queue = getQueue();
+    queue.push(queuedItem);
+    saveQueue(queue);
+    showToast(sendSecond ? '📴 Saved offline, both reports will retry later' : '📴 Saved offline, report will retry later');
+  }
+}
+
+function showToast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function renderAll() {
+  renderTotals();
+  if (mode === 'complete') renderSummary();
+  updatePendingCount();
+}
+
 document.getElementById('sessionDate').value = new Date().toLocaleDateString('en-CA');
 setMode('simple');
+updatePendingCount();
+
+window.addEventListener('online', () => flushPendingSubmissions(false));
+window.addEventListener('load', () => flushPendingSubmissions(false));
 </script>
 </body>
 </html>
