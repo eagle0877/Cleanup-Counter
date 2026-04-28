@@ -204,34 +204,33 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
         </div>
         <div class="gps-status" id="gpsStatus"></div>
       </div>
-      <div id="completeFields" style="display:none;">
-        <div class="field-row">
-          <div class="field-col">
-            <label class="field-label">🏘 Municipality (County)</label>
-            <select class="field-select" id="fMunicipality">
-              <option value="">SELECT COUNTY</option>
-              <option value="ANNAPOLIS">ANNAPOLIS</option>
-              <option value="ANTIGONISH">ANTIGONISH</option>
-              <option value="CAPE BRETON">CAPE BRETON</option>
-              <option value="COLCHESTER">COLCHESTER</option>
-              <option value="CUMBERLAND">CUMBERLAND</option>
-              <option value="DIGBY">DIGBY</option>
-              <option value="GUYSBOROUGH">GUYSBOROUGH</option>
-              <option value="HALIFAX">HALIFAX</option>
-              <option value="HANTS">HANTS</option>
-              <option value="INVERNESS">INVERNESS</option>
-              <option value="KINGS">KINGS</option>
-              <option value="LUNENBURG">LUNENBURG</option>
-              <option value="PICTOU">PICTOU</option>
-              <option value="QUEENS">QUEENS</option>
-              <option value="RICHMOND">RICHMOND</option>
-              <option value="SHELBURNE">SHELBURNE</option>
-              <option value="VICTORIA">VICTORIA</option>
-              <option value="YARMOUTH">YARMOUTH</option>
-            </select>
-          </div>
+      <div class="field-row">
+        <div class="field-col">
+          <label class="field-label">🏘 Municipality (County)</label>
+          <select class="field-select" id="fMunicipality">
+            <option value="">SELECT COUNTY</option>
+            <option value="ANNAPOLIS">ANNAPOLIS</option>
+            <option value="ANTIGONISH">ANTIGONISH</option>
+            <option value="CAPE BRETON">CAPE BRETON</option>
+            <option value="COLCHESTER">COLCHESTER</option>
+            <option value="CUMBERLAND">CUMBERLAND</option>
+            <option value="DIGBY">DIGBY</option>
+            <option value="GUYSBOROUGH">GUYSBOROUGH</option>
+            <option value="HALIFAX">HALIFAX</option>
+            <option value="HANTS">HANTS</option>
+            <option value="INVERNESS">INVERNESS</option>
+            <option value="KINGS">KINGS</option>
+            <option value="LUNENBURG">LUNENBURG</option>
+            <option value="PICTOU">PICTOU</option>
+            <option value="QUEENS">QUEENS</option>
+            <option value="RICHMOND">RICHMOND</option>
+            <option value="SHELBURNE">SHELBURNE</option>
+            <option value="VICTORIA">VICTORIA</option>
+            <option value="YARMOUTH">YARMOUTH</option>
+          </select>
         </div>
       </div>
+      <div id="completeFields" style="display:none;"></div>
     </div>
   </div>
 
@@ -243,7 +242,6 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
   </div>
   <div class="action-btns-secondary">
     <button class="btn-secondary" type="button" onclick="flushPendingSubmissions(true)">🔄 Sync Now</button>
-    <button class="btn-secondary" type="button" onclick="submitByEmail()">📧 Email Backup</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -301,7 +299,6 @@ function setMode(m) {
   document.getElementById('formHeader').textContent = m === 'simple' ? '⚡ Simple Report' : '📋 Complete Report';
   document.getElementById('simpleWeightSection').style.display = m === 'simple' ? 'block' : 'none';
   document.getElementById('completeCategoriesSection').style.display = m === 'complete' ? 'block' : 'none';
-  document.getElementById('completeFields').style.display = m === 'complete' ? 'block' : 'none';
   if (m === 'complete') { initDropdown(); renderActiveCategory(); }
   renderAll();
 }
@@ -375,12 +372,13 @@ const catItems = c => c.entries.reduce((s,e) => s + (e.items || 0), 0);
 const grandLbs = () => (mode === 'simple' ? simpleWeight : builtinCats.reduce((s,c) => s + catLbs(c), 0));
 
 function getDiversionPct() {
+  if (mode === 'simple') return '';
   const gl = grandLbs();
-  if (mode !== 'complete') return '0';
   const divWeight = builtinCats.reduce((sum, c) =>
     sum + c.entries.reduce((s, e) => s + (e.diverted ? (e.lbs || 0) : 0), 0), 0
   );
-  return gl > 0 ? ((divWeight / gl) * 100).toFixed(1) : '0';
+  const pct = gl > 0 ? ((divWeight / gl) * 100).toFixed(1) : 0;
+  return pct === '0.0' ? '' : pct;
 }
 
 function renderTotals() {
@@ -492,12 +490,12 @@ function buildEmailData() {
 
   let catBreakdownText = "";
   if (mode === 'complete') {
-    catBreakdownText = "\\nCATEGORY BREAKDOWN:\\n";
+    catBreakdownText = "\\\\nCATEGORY BREAKDOWN:\\\\n";
     builtinCats.filter(c => catLbs(c) > 0 || catItems(c) > 0).forEach(c => {
-      catBreakdownText += `${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items\\n`;
+      catBreakdownText += `${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items\\\\n`;
       if(c.id === 'other'){
         c.entries.forEach(e => {
-          if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\\n`;
+          if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\\\\n`;
         });
       }
     });
@@ -524,16 +522,11 @@ function buildEmailData() {
   return {
     date,
     subject: `Cleanup ${date}`,
-    body: `CLEANUP REPORT\\nDate: ${date}\\nArea: ${v('fArea')}\\nWeight: ${gl.toFixed(1)} lbs\\nDiversion: ${divPct}%${catBreakdownText}\\n\\nCSV 1 (General):\\n${csv1}\\n\\nCSV 2 (Internal):\\n${csv2}`
+    body: `CLEANUP REPORT\\\\nDate: ${date}\\\\nArea: ${v('fArea')}\\\\nWeight: ${gl.toFixed(1)} lbs\\\\nDiversion: ${divPct}%${catBreakdownText}\\\\n\\\\nCSV 1 (General):\\\\n${csv1}\\\\n\\\\nCSV 2 (Internal):\\\\n${csv2}`
   };
 }
 
 function submitByEmail() {
-  const gl = grandLbs();
-  if (gl === 0) {
-    showToast('⚠️ No weight entered');
-    return;
-  }
   const emailData = buildEmailData();
   const body = encodeURIComponent(emailData.body);
   window.location.href = `mailto:${EMAIL_TO}?subject=${encodeURIComponent(emailData.subject)}&body=${body}`;
@@ -679,12 +672,6 @@ async function flushPendingSubmissions(showFeedback = false) {
 }
 
 async function submitSession() {
-  const gl = grandLbs();
-  if (gl === 0) {
-    showToast('⚠️ No weight entered');
-    return;
-  }
-
   const payload1 = buildGoogleFormPayload();
   const sendSecond = mode === 'complete';
   const payload2 = sendSecond ? buildSecondGoogleFormPayload() : null;
