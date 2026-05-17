@@ -9,6 +9,7 @@
 :root{
   --black:#0e0e0e; --ocean:#1c4a42; --teal:#2d7a6e;
   --seafoam:#4aada0; --cream:#f5f1e8; --white:#fff; --accent:#c8a84b;
+  --submit-wait:#c8a84b;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(--cream);overflow-x:hidden;}
@@ -65,11 +66,14 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 .gps-row{display:flex;gap:6px;align-items:center;}
 .gps-btn{width:62px;height:62px;border-radius:10px;background:var(--ocean);border:none;cursor:pointer;font-size:28px;color:#fff;}
 .gps-status{font-size:11px;margin-top:3px;color:var(--teal);min-height:14px;}
+.field-note{font-size:11px;color:#888;margin-top:4px;line-height:1.35;}
 .sync-note{margin:0 14px 8px;background:#eef8f5;border:1px solid #d5ece5;border-radius:14px;padding:10px 12px;font-size:12px;color:var(--ocean);}
 .sync-note b{color:var(--teal);}
 .action-btns{display:flex;gap:8px;margin:14px 14px 8px;}
 .btn-reset{flex:1;padding:22px;background:#f5f1e8;border:2px solid #ddd;border-radius:14px;cursor:pointer;font-weight:700;color:#888;font-size:20px;}
-.btn-submit{flex:2;padding:22px;background:var(--teal);color:white;border:none;border-radius:14px;cursor:pointer;font-weight:700;font-size:20px;}
+.btn-submit{flex:2;padding:22px;background:var(--teal);color:white;border:none;border-radius:14px;cursor:pointer;font-weight:700;font-size:20px;transition:background .2s, opacity .2s;}
+.btn-submit.waiting{background:var(--submit-wait);color:var(--black);opacity:.95;}
+.btn-submit:disabled{cursor:not-allowed;}
 .action-btns-secondary{display:flex;gap:8px;margin:0 14px 28px;}
 .btn-secondary{flex:1;padding:20px;background:var(--ocean);color:white;border:none;border-radius:14px;cursor:pointer;font-weight:700;font-size:20px;}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:white;padding:12px 22px;border-radius:30px;font-size:13px;transition:transform .3s,opacity .3s;opacity:0;z-index:999;max-width:90vw;text-align:center;}
@@ -121,7 +125,6 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 .history-card-cats { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .history-card-cats span { font-size: 11px; background: rgba(255,255,255,0.06); border-radius: 5px; padding: 2px 7px; color: #b0c4d8; }
 .history-body.collapsed { display: none; }
-
 </style>
 </head>
 <body>
@@ -144,7 +147,6 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
   <div class="date-bar">
     <input class="date-input" type="text" id="sessionDate" placeholder="📅 Date">
   </div>
-
   <div class="total-banner">
     <div class="totals-row">
       <div class="total-block">
@@ -154,7 +156,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
       <div class="total-divider"></div>
       <div class="total-block">
         <div class="total-lbl">Diverted</div>
-        <div class="total-num" id="grandDiversion">0<span class="total-unit">%</span></div>
+        <div class="total-num" id="grandDiversion">—<span class="total-unit"></span></div>
       </div>
     </div>
     <div class="total-sub" id="totalSub">Add debris entries below</div>
@@ -260,7 +262,7 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 
   <div class="action-btns">
     <button class="btn-reset" type="button" onclick="confirmReset()">🗑 Reset</button>
-    <button class="btn-submit" type="button" onclick="submitSession()">☁️ Submit</button>
+    <button class="btn-submit" id="submitBtn" type="button" onclick="submitSession()">☁️ Submit</button>
   </div>
   <div class="action-btns-secondary">
     <button class="btn-secondary" type="button" onclick="flushPendingSubmissions(true)">🔄 Sync Now</button>
@@ -298,7 +300,6 @@ html,body{min-height:100%;font-family:'Source Sans 3',sans-serif;background:var(
 </div>
 
 <script>
-const EMAIL_TO = 'ScotianShorescleanupalert@gmail.com';
 const PROXY_URL = 'https://script.google.com/macros/s/AKfycbz4FzQyvO8Xf7asKxMZaMp4K2OH_Yx3gC3mVT3n5UWCUqMnfEMZ5x46LuLVnU4gmSLWIQ/exec';
 const QUEUE_KEY = 'ss_pending_submissions_v2';
 
@@ -310,11 +311,11 @@ const safeStorage = {
 };
 
 let _memQueue = [];
+let isSubmitting = false;
 
 const DEFAULTS = [
   {id:'aquaculture', name:'Aquaculture Pipe', emoji:'➰'},
   {id:'baitbags', name:'Bait Bags', emoji:'🥡'},
-  {id:'bottles', name:'Bottles', emoji:'🍾'},
   {id:'buoys', name:'Buoys', emoji:'📍'},
   {id:'escapepanels', name:'Escape Panels', emoji:'🚪'},
   {id:'fishbins', name:'Fish Bins', emoji:'📦'},
@@ -325,10 +326,11 @@ const DEFAULTS = [
   {id:'traps', name:'Lobster Traps', emoji:'🕸️'},
   {id:'metal', name:'Metal', emoji:'⚙️'},
   {id:'plastic', name:'Plastic', emoji:'🥤'},
+  {id:'bottles', name:'Plastic Bottles', emoji:'🍾'},
+  {id:'styrafoam', name:'Polystyrene', emoji:'🧊'},
   {id:'rope', name:'Rope', emoji:'🪢'},
   {id:'shotgunshells', name:'Shotgun Shells', emoji:'🐚'},
   {id:'straps', name:'Straps', emoji:'🎗️'},
-  {id:'styrafoam', name:'Styrafoam', emoji:'🧊'},
   {id:'tires', name:'Tires', emoji:'🛞'},
   {id:'wood', name:'Wood', emoji:'🪵'},
   {id:'other', name:'Other', emoji:'➕'}
@@ -347,6 +349,14 @@ function loadBuiltins() {
 
 function persist() {
   builtinCats.forEach(c => safeStorage.setItem('ss_builtin_' + c.id, JSON.stringify(c.entries)));
+}
+
+function setSubmitButtonWaiting(waiting) {
+  const btn = document.getElementById('submitBtn');
+  if (!btn) return;
+  btn.disabled = waiting;
+  btn.classList.toggle('waiting', waiting);
+  btn.textContent = waiting ? 'Please Wait' : '☁️ Submit';
 }
 
 function setMode(m) {
@@ -442,10 +452,13 @@ function grandLbs() {
 }
 
 function getDiversionPct() {
-  if (mode === 'simple') return 0;
+  if (mode === 'simple') return null;
   const total = grandLbs();
-  if (!total) return 0;
-  const diverted = builtinCats.reduce((s,c) => s + c.entries.filter(e=>e.diverted).reduce((ss,e)=>ss+(e.lbs||0),0), 0);
+  if (!total) return null;
+  const diverted = builtinCats.reduce(
+    (s,c) => s + c.entries.filter(e => e.diverted).reduce((ss,e) => ss + (e.lbs || 0), 0),
+    0
+  );
   return Math.round((diverted / total) * 100);
 }
 
@@ -458,7 +471,8 @@ function renderTotals() {
   const gl = grandLbs();
   const dp = getDiversionPct();
   document.getElementById('grandLbs').innerHTML = gl.toFixed(1) + '<span class="total-unit">lbs</span>';
-  document.getElementById('grandDiversion').innerHTML = dp + '<span class="total-unit">%</span>';
+  document.getElementById('grandDiversion').innerHTML =
+    dp == null ? '—<span class="total-unit"></span>' : dp + '<span class="total-unit">%</span>';
   const totalItems = mode === 'complete' ? builtinCats.reduce((s,c) => s + catItems(c), 0) : 0;
   document.getElementById('totalSub').textContent = mode === 'complete'
     ? `${totalItems} items across ${builtinCats.filter(c=>c.entries.length).length} categories`
@@ -514,41 +528,23 @@ function confirmReset() {
   showToast('🗑 Session cleared');
 }
 
-function esc(val) {
-  if (val === null || val === undefined) return '""';
-  let str = String(val).replace(/"/g, '""');
-  return `"${str}"`;
-}
-
-function buildEmailData() {
-  const gl = grandLbs();
-  const v = id => (document.getElementById(id)?.value||'').trim();
-  const date = v('sessionDate') || new Date().toLocaleDateString('en-CA');
-  const cat = id => builtinCats.find(c => c.id === id);
-  const divPct = getDiversionPct();
-  let catBreakdownText = "";
-  if (mode === 'complete') {
-    catBreakdownText = "\\nCATEGORY BREAKDOWN:\\n";
-    builtinCats.filter(c => catLbs(c) > 0 || catItems(c) > 0).forEach(c => {
-      catBreakdownText += `${c.emoji} ${c.name}: ${catLbs(c).toFixed(1)} lbs, ${catItems(c)} items\\n`;
-      if(c.id === 'other'){ c.entries.forEach(e => { if(e.customName) catBreakdownText += `  └─ ${e.customName}: ${e.lbs.toFixed(1)} lbs\\n`; }); }
-    });
-  }
-  const csv1 = [esc(date), esc(gl.toFixed(1)), esc(v('fMunicipality')), esc(v('fArea')), esc(v('fMostInteresting')), esc(v('fMostCommon')), esc(v('fNumPeople')), esc(v('fPeopleIncluded')), esc(v('fBandCount')), esc(divPct), esc(v('fGps'))].join(',');
-  const csv2 = [esc(v('fPeopleIncluded')), esc(date), esc(v('fArea')), esc(gl.toFixed(1)), esc('Yes'), esc(catLbs(cat('rope')).toFixed(1)), esc(catItems(cat('lobstertags'))), esc(catItems(cat('straps'))), esc(catItems(cat('lobsterbands'))), esc(catItems(cat('escapepanels'))), esc(catItems(cat('traprunners'))), esc(catItems(cat('bottles'))), esc(catItems(cat('shotgunshells'))), esc(catLbs(cat('aquaculture')).toFixed(1)), esc(catItems(cat('fishbins'))), esc(catItems(cat('baitbags'))), esc(catItems(cat('buoys'))), esc(catLbs(cat('traps')).toFixed(1)), esc(''), esc(catLbs(cat('other')).toFixed(1)), esc(catItems(cat('tires')))].join(',');
-  return { date, subject: `Cleanup ${date}`, body: `CLEANUP REPORT\\nDate: ${date}\\nArea: ${v('fArea')}\\nWeight: ${gl.toFixed(1)} lbs\\nDiversion: ${divPct}%${catBreakdownText}\\n\\nCSV 1 (General):\\n${csv1}\\n\\nCSV 2 (Internal):\\n${csv2}` };
-}
-
 function buildGoogleFormPayload() {
   const gl = grandLbs();
   const v = id => (document.getElementById(id)?.value || '').trim();
   const date = v('sessionDate') || new Date().toLocaleDateString('en-CA');
   const divPct = getDiversionPct();
   return {
-    'entry.1435993974': date, 'entry.1049185717': gl.toFixed(1), 'entry.2050587287': v('fMunicipality'),
-    'entry.363926447': v('fArea'), 'entry.1341819910': v('fMostInteresting'), 'entry.891233553': v('fMostCommon'),
-    'entry.2054382914': v('fNumPeople'), 'entry.1578291135': v('fPeopleIncluded'), 'entry.1335521278': v('fBandCount'),
-    'entry.748449577': divPct, 'entry.1050729112': v('fGps'),
+    'entry.1435993974': date,
+    'entry.1049185717': gl.toFixed(1),
+    'entry.2050587287': v('fMunicipality'),
+    'entry.363926447': v('fArea'),
+    'entry.1341819910': v('fMostInteresting'),
+    'entry.891233553': v('fMostCommon'),
+    'entry.2054382914': v('fNumPeople'),
+    'entry.1578291135': v('fPeopleIncluded'),
+    'entry.1335521278': v('fBandCount'),
+    'entry.748449577': mode === 'simple' ? '' : (divPct ?? ''),
+    'entry.1050729112': v('fGps'),
   };
 }
 
@@ -602,16 +598,23 @@ async function flushPendingSubmissions(showFeedback = false) {
 }
 
 async function submitSession() {
+  if (isSubmitting) return;
+  isSubmitting = true;
+  setSubmitButtonWaiting(true);
+
   const payload1 = buildGoogleFormPayload();
   const sendSecond = mode === 'complete';
   const payload2 = sendSecond ? buildSecondGoogleFormPayload() : null;
   const queuedItem = { ts: Date.now(), sendSecond, payload1, payload2 };
-  if (!navigator.onLine) {
-    const queue = getQueue(); queue.push(queuedItem); saveQueue(queue);
-    showToast(sendSecond ? '📴 Saved offline, both reports will upload later' : '📴 Saved offline, report will upload later');
-    return;
-  }
+
   try {
+    if (!navigator.onLine) {
+      const queue = getQueue(); queue.push(queuedItem); saveQueue(queue);
+      resetAfterSubmit();
+      showToast(sendSecond ? '📴 Saved offline, both reports will upload later' : '📴 Saved offline, report will upload later');
+      return;
+    }
+
     await postToProxy('main', ['', ...Object.values(payload1)]);
     if (sendSecond && payload2) await postToProxy('internal', ['', ...Object.values(payload2)]);
     saveSessionHistory();
@@ -620,7 +623,11 @@ async function submitSession() {
     setTimeout(() => flushPendingSubmissions(false), 600);
   } catch {
     const queue = getQueue(); queue.push(queuedItem); saveQueue(queue);
+    resetAfterSubmit();
     showToast(sendSecond ? '📴 Saved offline, both reports will retry later' : '📴 Saved offline, report will retry later');
+  } finally {
+    isSubmitting = false;
+    setSubmitButtonWaiting(false);
   }
 }
 
@@ -637,7 +644,6 @@ function renderAll() {
   updatePendingCount();
 }
 
-// ── Session Tally ────────────────────────────────────────────────────────────
 function renderSessionTally() {
   const body = document.getElementById('sessionTallyBody');
   if (!body) return;
@@ -683,7 +689,6 @@ function renderSessionTally() {
   body.innerHTML = rows + totalBar;
 }
 
-// ── Edit Modal ────────────────────────────────────────────────────────────────
 let _editCatId = null;
 let _editIdx = null;
 
@@ -740,7 +745,6 @@ renderSessionHistory();
 
 window.addEventListener('online', () => flushPendingSubmissions(false));
 
-// ── Session History ───────────────────────────────────────────────────────────
 const SESSION_HISTORY_KEY = 'ss_session_history';
 const MAX_HISTORY = 10;
 
@@ -822,7 +826,6 @@ function resetAfterSubmit() {
   renderAll();
   if (mode === 'complete') renderActiveCategory();
 }
-
 </script>
 
 <div class="section-card" id="sessionHistorySection" style="margin-top:16px;">
